@@ -10,10 +10,7 @@ export const fetchCatsRequest = (counter: number): FetchCatsRequest => ({
   path: `https://pixabay.com/api/?key=48746472-fa818d7d91482b4fbfa0b6b14&per_page=${counter}&q=cat`,
 });
 
-export const fetchCatsCommit = (payload: { hits: Array<{ previewURL: string, webformatURL: string, user: string, largeImageURL: string }> }): FetchCatsCommit => ({ 
-  type: 'FETCH_CATS_COMMIT', 
-  payload 
-});
+export const fetchCatsCommit = (payload: Picture[]): FetchCatsCommit => ({ type: 'FETCH_CATS_COMMIT', payload });
 
 export const fetchCatsRollback = (error: Error): FetchCatsRollback => ({ type: 'FETCH_CATS_ROLLBACK', error });
 

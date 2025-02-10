@@ -1,21 +1,23 @@
-import { Loop, liftState, loop } from 'redux-loop';
+import { Cmd, Loop, liftState, loop } from 'redux-loop';
 import { compose } from 'redux';
 import { Actions } from './types/actions.type';
 import { Picture } from './types/picture.type';
 import { cmdFetch } from './commands';
 import { ApiState } from './types/api.type';
 import { failure, loading, success } from './api';
+import { Option, none, some } from 'fp-ts/lib/Option';
+import { fetchCatsRequest } from './actions';
 
 export type State = {
   counter: number;
   pictures: ApiState;
-  pictureSelected: Picture | null;
+  pictureSelected: Option<Picture>;
 };
 
 export const defaultState: State = {
   counter: 3,
   pictures: { kind: 'LOADING' },
-  pictureSelected: null,
+  pictureSelected: none,
 };
 
 export const reducer = (state: State | undefined, action: Actions): State | Loop<State> => {
@@ -24,43 +26,30 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
     case 'INCREMENT': {
       const newCounter = state.counter + 1;
       return loop(
-        { ...state, counter: newCounter, pictures: loading() },
-        cmdFetch({
-          type: 'FETCH_CATS_REQUEST',
-          method: 'GET',
-          path: `https://pixabay.com/api/?key=48746472-fa818d7d91482b4fbfa0b6b14&per_page=${newCounter}&q=cat`
-        })
+        { ...state, counter: newCounter },
+        Cmd.action(fetchCatsRequest(newCounter)) 
       );
     }
     case 'DECREMENT': {
       const newCounter = Math.max(state.counter - 1, 3);
       return loop(
-        { ...state, counter: newCounter, pictures: loading() },
-        cmdFetch({
-          type: 'FETCH_CATS_REQUEST',
-          method: 'GET',
-          path: `https://pixabay.com/api/?key=48746472-fa818d7d91482b4fbfa0b6b14&per_page=${newCounter}&q=cat`
-        })
+        { ...state, counter: newCounter },
+        Cmd.action(fetchCatsRequest(newCounter))
       );
     }
     case 'SELECT_PICTURE':
-      return { ...state, pictureSelected: action.picture };
+      return { ...state, pictureSelected: some(action.picture) };
     case 'CLOSE_MODAL':
-      return { ...state, pictureSelected: null };
+      return { ...state, pictureSelected: none };
     case 'FETCH_CATS_COMMIT': {
       const payload = action.payload;
       return {
         ...state,
-        pictures: success(
-          payload.hits.map(hit => ({
-            previewFormat: hit.previewURL,
-            webFormat: hit.webformatURL,
-            author: hit.user,
-            largeFormat: hit.largeImageURL
-          }))
-        ),
+        pictures: success(payload),
       };
     }
+    case 'FETCH_CATS_REQUEST':
+      return loop({ ...state, pictures: loading() }, cmdFetch(action));
     case 'FETCH_CATS_ROLLBACK':
       return {
         ...state,

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSelectedPicture } from '../reducer';
-
+import { isNone } from 'fp-ts/lib/Option';
 
 const Container = styled.div`
   position: fixed; /* Stay in place */
@@ -34,18 +34,26 @@ const Image = styled.img`
   max-width: 700px;
 `;
 
+const Author = styled.p`
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: grey;
+`;
+
 const Modal = () => {
   const selectedPicture = useSelector(getSelectedPicture);
   const dispatch = useDispatch();
-  if (!selectedPicture) return null;
+  if (isNone(selectedPicture)) return null;
+  const picture = selectedPicture.value;
   return (
     <Container>
-      <Image src={selectedPicture.largeFormat} alt="Large Cat" />
+      <Author>Author: {picture.author}</Author>
+      <Image src={picture.largeFormat} alt="Large Cat" />
       <Button onClick={() => dispatch({ type: 'CLOSE_MODAL' })}>X</Button>
     </Container>
   );
 };
-
 
 const portalRoot = document.getElementById('modal');
 

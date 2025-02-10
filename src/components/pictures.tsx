@@ -42,7 +42,7 @@ const Pictures = () => {
       {pictures.kind === 'LOADING' && <Loading>Loading pictures...</Loading>}
       {pictures.kind === 'FAILURE' && <ErrorMessage>Error: {pictures.error}</ErrorMessage>}
       {pictures.kind === 'SUCCESS' &&
-      pictures.pictures.map((picture: { previewFormat: string; author: string }) => (
+      pictures.pictures.map((picture) => (
       <Image
         key={picture.previewFormat}
         src={picture.previewFormat}

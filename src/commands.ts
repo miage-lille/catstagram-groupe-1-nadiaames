@@ -1,6 +1,7 @@
 import { Cmd } from 'redux-loop';
 import { fetchCatsCommit, fetchCatsRollback } from './actions';
 import { FetchCatsRequest } from './types/actions.type';
+import { Picture } from './types/picture.type';
 
 export const cmdFetch = (action: FetchCatsRequest) =>
   Cmd.run(
@@ -8,11 +9,17 @@ export const cmdFetch = (action: FetchCatsRequest) =>
       return fetch(action.path, {
         method: action.method,
       })
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then((data) => data); 
+        .then(checkStatus)
+        .then(response => response.json())
+        .then(data => {
+          const pictures: Picture[] = data.hits.map((hit: any) => ({
+            previewFormat: hit.previewURL,
+            webFormat: hit.webformatURL,
+            author: hit.user,
+            largeFormat: hit.largeImageURL
+          }));
+          return pictures; 
+        });
     },
     {
       successActionCreator: fetchCatsCommit, // (equals to (payload) => fetchCatsCommit(payload))

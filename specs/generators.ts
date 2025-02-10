@@ -18,7 +18,7 @@ const getPayload = (): fc.Arbitrary<Picture[]> => fc.array(getPictureArb());
 const getFetchCatsRequestAction = (counter: number): fc.Arbitrary<FetchCatsRequest> =>
   fc.record({
     type: fc.constant('FETCH_CATS_REQUEST'),
-    path: fc.constant(`https://pixabay.com/api/?key=24523143-8a90135b40ac6e775ba6758cb&per_page=${counter}&q=cat`),
+    path: fc.constant(`https://pixabay.com/api/?key=48746472-fa818d7d91482b4fbfa0b6b14&per_page=${counter}&q=cat`),
     method: fc.constant('GET'),
   });
 
