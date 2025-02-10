@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import ReactDOM from 'react-dom';
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { getSelectedPicture } from '../reducer';
+
 
 const Container = styled.div`
   position: fixed; /* Stay in place */
@@ -31,23 +34,22 @@ const Image = styled.img`
   max-width: 700px;
 `;
 
-interface ModalProps {
-  largeFormat: string;
-  close(): void;
-}
-
-const Modal = ({ largeFormat, close }: ModalProps) => {
+const Modal = () => {
+  const selectedPicture = useSelector(getSelectedPicture);
+  const dispatch = useDispatch();
+  if (!selectedPicture) return null;
   return (
     <Container>
-      <Image src={largeFormat} />
-      <Button onClick={close}>X</Button>
+      <Image src={selectedPicture.largeFormat} alt="Large Cat" />
+      <Button onClick={() => dispatch({ type: 'CLOSE_MODAL' })}>X</Button>
     </Container>
   );
 };
 
+
 const portalRoot = document.getElementById('modal');
 
-const ModalPortal = ({ largeFormat, close }: ModalProps) =>
-  portalRoot ? ReactDOM.createPortal(<Modal largeFormat={largeFormat} close={close} />, portalRoot) : null;
+const ModalPortal = () =>
+  portalRoot ? ReactDOM.createPortal(<Modal />, portalRoot) : null;
 
 export default ModalPortal;

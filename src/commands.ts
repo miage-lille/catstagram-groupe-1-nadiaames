@@ -7,7 +7,12 @@ export const cmdFetch = (action: FetchCatsRequest) =>
     () => {
       return fetch(action.path, {
         method: action.method,
-      }).then(checkStatus);
+      })
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then((data) => data); 
     },
     {
       successActionCreator: fetchCatsCommit, // (equals to (payload) => fetchCatsCommit(payload))
